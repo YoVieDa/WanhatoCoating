@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="css/typscript.css" rel="stylesheet">
+
+  <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script> -->
+  <script src="js/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="js/jquery.dataTables.min.js"></script>
+  <script src="js/html2pdf.bundle.min.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/sweatalert.js"></script>
+  <title>Wanhato Coating Struk Print</title>
+  <link rel="shortcut icon" href="img/Logo.png">
+</head>
+<body>
+
+<div class="container">
+  <h1 class="title" style="margin-bottom: 20px;">Daftar Pembelian</h1>
+
+  <div class="form-row row" style="margin-bottom: 20px;">
+    <div class="form-group col-2">
+      <label for="input-nama">Name</label>
+      <input type="text" id="input-nama" required>
+    </div>
+      
+    <div class="form-group col-2" >
+      <label for="input-alamat">Address</label>
+      <input type="text" id="input-alamat" required>
+    </div>
+
+    <div class="form-group col-2" >
+      <label for="input-tanggal">Date</label>
+      <input type="date" id="input-tanggal" required disabled>
+    </div>
+    <div class="form-group col-1" >
+      <button class="btn" id="btn-toggle-date">Edit Date</button>
+    </div>
+
+    <div class="checkbox-group col-3">
+      <input type="checkbox" class="form-check-input" id="cb-nomer-rekening-apply">
+      <label class="form-check h4" for="cb-nomer-rekening-apply">Cetak Struk Tanpa Nomer Rekening</label>
+    </div>
+  </div>
+
+  <button class="btn" id="btn-add-item">+ Tambah Pembelian</button>
+
+  <table id="dTableItem">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Item</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Total</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Isi otomatis dari JS -->
+    </tbody>
+  </table>
+
+  <div class="right-side col-4 flex" style="margin-top: 20px;">
+    <label class="mr-3" for="input-total-bayar" style="margin-bottom: 5px;">Total</label>
+    <input class="inline border-1" type="text" id="input-total-bayar" style="text-align: right; margin-left: auto; width: 100%;" disabled>
+  </div>
+
+  <div class="right-side col-12 md-2">
+    <button class="btn" id="btn-show-modal-print">Cetak Struk</button>
+  </div>
+  
+</div>
+
+<!-- Modal Form -->
+<div id="formModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="close-modal-form">&times;</span>
+    <h3>Form Pembelian</h3>
+    <form id="modal-pembelian">
+      <label for="input-nama-produk">Item</label>
+      <input type="text" id="input-nama-produk" required>
+      
+      <label for="input-jumlah-produk">Quantity</label>
+      <input type="text" id="input-jumlah-produk" required>
+      
+      <label for="input-harga-produk">Price (Rp)</label>
+      <input type="text" id="input-harga-produk" required>
+
+      <button class="submit-btn" id="btn-save-form">Simpan</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Print Struk -->
+<div id="printStrukModal" class="modal">
+  <div class="modal-content" style="width: 400px; padding: 0 !important;">
+    <div id="print-area">
+      <div class="logo-container">
+        <img src="img/Kop.png" alt="Logo" />
+      </div>
+      <div class="logo-container">
+        <h4 class="title">INVOICE</h4>
+      </div>
+      <div class="col-12">
+        <p id="tgl-transaksi">Date: </p>
+        <p id="nama-konsumen">To: </p>
+        <p id="alamat-konsumen">Address: </p>
+      </div>
+      <table id="dTableItemStruk">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Harga</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div style="text-align: right;">
+        <h5 style="margin-right: 0; margin-top: 10px;" id="total-bayar-struk">Total</h5>
+      </div>
+      <p style="font-size: 10px;" class="col-7" id="no-rek">BCA Transfer: 1730254853 (Muljatno Uun)</p>
+      <div class="col-12 flex" style="align-items: center">
+        <div class="logo-container">
+          <h3 class="dancing-script" style="margin-left:0;">Thankyou for Trusting Us</h3>
+        </div>
+        <div class="right-side logo-container" >
+          <p style="margin-bottom: 10px; margin-top: 0;">Best Regard</p>
+          <img src="img/Logo.png" alt="Logo" id="kopImage" style="height: 50px;">
+        </div>
+      </div>
+    </div>
+  
+    <div style="margin-left: 20px; margin-bottom: 0.5rem;">
+      <button class="btn" id="close-modal-struk">Cancel</button>
+      <button class="btn" id="btn-print-struk">Cetak</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  
+</script>
+
+</body>
+</html>
