@@ -17,7 +17,7 @@
   <script src="js/script.js"></script>
   <script src="js/sweatalert.js"></script>
   <title>Wanhato Coating Struk Print</title>
-  <link rel="shortcut icon" href="img/Logo.png">
+  <link rel="shortcut icon" href="./img/Logo.png">
 </head>
 <body>
 
@@ -50,6 +50,7 @@
   </div>
 
   <button class="btn" id="btn-add-item">+ Tambah Pembelian</button>
+  <button class="btn" id="btn-add-potongan">+ Tambah Potongan</button>
 
   <table id="dTableItem">
     <thead>
@@ -58,6 +59,20 @@
         <th>Item</th>
         <th>Quantity</th>
         <th>Price</th>
+        <th>Total</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Isi otomatis dari JS -->
+    </tbody>
+  </table>
+
+  <table id="dTablePotongan" hidden>
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Promotion Name</th>
         <th>Total</th>
         <th>Action</th>
       </tr>
@@ -98,12 +113,29 @@
   </div>
 </div>
 
+<!-- Modal Form Discount -->
+<div id="formModalPotongan" class="modal">
+  <div class="modal-content">
+    <span class="close" id="close-modal-form-potongan">&times;</span>
+    <h3>Form Promo Potongan Harga</h3>
+    <form id="modal-pembelian-potongan">
+      <label for="input-nama-potongan">Potongan</label>
+      <input type="text" id="input-nama-potongan" required>
+      
+      <label for="input-jumlah-potongan">Price (Rp)</label>
+      <input type="text" id="input-jumlah-potongan" required>
+
+      <button class="submit-btn" id="btn-save-form-potongan">Simpan</button>
+    </form>
+  </div>
+</div>
+
 <!-- Modal Print Struk -->
 <div id="printStrukModal" class="modal">
   <div class="modal-content" style="width: 400px; padding: 0 !important;">
     <div id="print-area">
       <div class="logo-container">
-        <img src="img/Kop.png" alt="Logo" />
+        <img src="./img/Kop.png" alt="Logo" />
       </div>
       <div class="logo-container">
         <h4 class="title">INVOICE</h4>
@@ -126,6 +158,8 @@
         <tbody></tbody>
       </table>
 
+      <h6 style="margin-top: 5px; font-size: 7px" id="list-potongan-print" hidden></h6>
+
       <div style="text-align: right;">
         <h5 style="margin-right: 0; margin-top: 10px;" id="total-bayar-struk">Total</h5>
       </div>
@@ -136,7 +170,7 @@
         </div>
         <div class="right-side logo-container" >
           <p style="margin-bottom: 10px; margin-top: 0;">Best Regard</p>
-          <img src="img/Logo.png" alt="Logo" id="kopImage" style="height: 50px;">
+          <img src="./img/Logo.png" alt="Logo" id="kopImage" style="height: 50px;">
         </div>
       </div>
     </div>
@@ -154,3 +188,4 @@
 
 </body>
 </html>
+
