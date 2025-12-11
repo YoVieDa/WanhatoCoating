@@ -1,7 +1,8 @@
 $(document).ready(function () {
     let arrItem = Array();
-    let dTableItem;
     let totalBayar = 0;
+    let arrPotongan = Array();
+    let totalPotongan = 0;
 
     function alertError(error, $timer = null) {
         if ($timer == null) {
@@ -31,6 +32,11 @@ $(document).ready(function () {
     function closeModalForm() {
         $("#formModal").css("display", "none");
         $("#modal-pembelian")[0].reset();
+    }
+
+    function closeModalFormPotongan() {
+        $("#formModalPotongan").css("display", "none");
+        $("#modal-pembelian-potongan")[0].reset();
     }
 
     function closeModalStruk() {
@@ -67,7 +73,40 @@ $(document).ready(function () {
 
         $("#input-total-bayar").val("RP" + addDotInNumber(totalBayar));
     }
-    
+
+    function refreshTablePotongan() {
+        if ( arrPotongan.length === 0 ) {
+            $("#dTablePotongan").prop("hidden", true);
+            return;
+        }
+        $("#dTablePotongan").prop("hidden", false);
+
+        dTablePotongan = new $('#dTablePotongan').DataTable( {
+            data: arrPotongan,
+            destroy: true,
+            paging: false,
+            searching: false,
+            columns: [ 
+                { data : null, render: function(data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }}, 
+                { data: "potongan" },
+                { data: "total" },
+                { data: "potongan", render: function(data, type, row, meta) {
+                    return "<button class='btn-small' id='btn-edit-potongan' value='"+data+"'><i class='fa fa-pen'></i> Edit</button> "+
+                            "<button class='btn-small' id='btn-delete-potongan' value='"+data+"'><i class='fa fa-trash'></i> Delete</button>";
+                }},
+            ]
+        });
+        $("#dTablePotongan_info").prop("hidden", true);
+        
+        totalPotongan = 0;
+        arrPotongan.forEach(element => {
+            totalPotongan += parseInt(replaceDotInNumber(element.total));
+        });
+
+        $("#input-total-bayar").val("RP" + addDotInNumber(totalBayar - totalPotongan));
+    }
 
     function saveItem() {
         let isDuplicate = false;
@@ -130,10 +169,55 @@ $(document).ready(function () {
         closeModalForm();
     }
 
+    function savePotongan() {
+        let isDuplicate = false;
+        let tempArrPotongan = Array();
+        let potongan;
+
+        if ($("#input-nama-potongan").val() == "") {
+            alertError("Nama Promo Masih Kosong!");
+            return;
+        }
+        if ($("#input-jumlah-potongan").val() == "") {
+            alertError("Harga Promo Masih Kosong!");
+            return;
+        }
+        else {
+            potongan = replaceDotInNumber($("#input-jumlah-potongan").val());
+            if (potongan < 0) {
+                alertError("Harga Promo Minimal 0!");
+                return;
+            }
+        }
+
+        tempArrPotongan = ({
+            "potongan" : $("#input-nama-potongan").val(),
+            "total" : addDotInNumber(potongan)
+        });
+
+        arrPotongan.forEach(element => {
+            if(element.produk == $("#input-nama-potongan").val()) {
+                arrPotongan[arrPotongan.indexOf(element)] = tempArrPotongan;
+                isDuplicate = true;
+            }
+        });
+
+        if (isDuplicate == false){
+            arrPotongan.push({
+                "potongan" : $("#input-nama-potongan").val(),
+                "total" : addDotInNumber(potongan)
+            });
+        }
+
+        refreshTablePotongan();
+        closeModalFormPotongan();
+    }
+
     refreshTableItem();
+    refreshTablePotongan();
     $("#input-tanggal").val(new Date().toISOString().split('T')[0]);
 
-    $("#input-jumlah-produk,"+"#input-harga-produk").keydown(function (e) {
+    $("#input-jumlah-produk,"+"#input-harga-produk,"+"#input-jumlah-potongan").keydown(function (e) {
         // Allow: backspace, delete, tab, escape, enter and .
         if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
             // Allow: Ctrl/cmd+A
@@ -154,7 +238,7 @@ $(document).ready(function () {
     });
 
     // Mengatur Field yang Number Only supaya ada titiknya
-    $("#input-jumlah-produk,"+"#input-harga-produk").keyup(function (e) {
+    $("#input-jumlah-produk,"+"#input-harga-produk,"+"#input-jumlah-potongan").keyup(function (e) {
         $(this).val(addDotInNumber(replaceDotInNumber($(this).val())));
     });
 
@@ -177,6 +261,7 @@ $(document).ready(function () {
         }
     })
 
+    // Item
     $("#btn-add-item").click(function (e) { 
         e.preventDefault();
         $("#formModal").css("display", "block");
@@ -246,6 +331,57 @@ $(document).ready(function () {
         });
         refreshTableItem();
     });
+    // Item - End
+
+    // Potongan
+    $("#btn-add-potongan").click(function (e) { 
+        e.preventDefault();
+        $("#formModalPotongan").css("display", "block");
+        $("#input-nama-potongan").prop("disabled", false);
+        $('#input-nama-potongan').focus();
+    });
+
+    $("#close-modal-form-potongan").click(function (e) { 
+        e.preventDefault();
+        closeModalFormPotongan();
+    });
+
+    $("#btn-save-form-potongan").click(function (e) {
+        e.preventDefault();
+        savePotongan();
+    });
+
+    $(document).on("click", "#btn-edit-potongan", function(e) {
+        e.preventDefault();
+        let potongan = $(this).val();
+        let index;
+        
+        arrPotongan.forEach(element => {
+            if(element.potongan == potongan) {
+                index = arrPotongan.indexOf(element);
+            }
+        });
+
+        $("#formModalPotongan").css("display", "block");
+        $("#input-nama-potongan").prop("disabled", true);
+        $("#input-nama-potongan").val(arrPotongan[index].potongan);
+        $("#input-jumlah-potongan").val(arrPotongan[index].total);
+    });
+
+    $(document).on("click", "#btn-delete-potongan", function(e) {
+        e.preventDefault();
+        let potongan = $(this).val();
+        let index;
+        
+        arrPotongan.forEach(element => {
+            if(element.potongan == potongan) {
+                index = arrPotongan.indexOf(element);
+                arrPotongan.splice(index, 1);
+            }
+        });
+        refreshTablePotongan();
+    });
+    // Potongan - End
 
     $("#btn-show-modal-print").click(function (e) {
         e.preventDefault();
@@ -293,8 +429,20 @@ $(document).ready(function () {
         });
         $("#dTableItemStruk_info").prop("hidden", true);
 
-        $("#total-bayar-struk").text("Total : Rp" + addDotInNumber(totalBayar));
-        // $("#input-total-bayar").val("RP" + addDotInNumber(totalBayar));
+        if (arrPotongan.length > 0) {
+            $("#list-potongan-print").attr("hidden", false);
+            let str = "Potongan\n";
+            arrPotongan.forEach(element => {
+                str += element.potongan + " Rp " + addDotInNumber(element.total) + "\n";
+            });
+            str += "Total Potongan: " + addDotInNumber(totalPotongan);
+            $("#list-potongan-print").html(str.replace(/\n/g, "<br>"));
+        } 
+        else {
+            $("#list-potongan-print").attr("hidden", true);
+        }
+        
+        $("#total-bayar-struk").text("Total : Rp" + addDotInNumber(totalBayar - totalPotongan));
     });
 
     $("#close-modal-struk").click(function (e) {
@@ -325,4 +473,5 @@ $(document).ready(function () {
             closeModal();
         }
     }
+
 })
