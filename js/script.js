@@ -431,11 +431,10 @@ $(document).ready(function () {
 
         if (arrPotongan.length > 0) {
             $("#list-potongan-print").attr("hidden", false);
-            let str = "Potongan\n";
+            let str = "Voucher Discount\n";
             arrPotongan.forEach(element => {
                 str += element.potongan + " Rp " + addDotInNumber(element.total) + "\n";
             });
-            str += "Total Potongan: " + addDotInNumber(totalPotongan);
             $("#list-potongan-print").html(str.replace(/\n/g, "<br>"));
         } 
         else {
@@ -475,3 +474,4 @@ $(document).ready(function () {
     }
 
 })
+
